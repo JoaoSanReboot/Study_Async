@@ -3,6 +3,7 @@ from .models import Categoria, Flashcard
 from django.contrib.messages import constants
 from django.contrib import messages
 
+
 def novo_flashcard(request):
     if not request.user.is_authenticated:
         return redirect('/usuarios/login')
@@ -55,8 +56,13 @@ def novo_flashcard(request):
         return redirect('/flashcard/novo_flashcard/')
     
 def deletar_flashcard(request, id):
+        
     flashcard = Flashcard.objects.get(id=id)
-    flashcard.delete()
+    if flashcard.user != request.user:
+         messages.add_message(request, constants.ERROR, "ERROR")
+         return redirect
 
-    messages.add_message(request, constants.SUCCESS, "Flashcard deletado com sucesso!")
-    return redirect('/flashcard/novo_flashcard/')
+    else:
+        flashcard.delete()
+        messages.add_message(request, constants.SUCCESS, "Flashcard deletado com sucesso!")
+        return redirect('/flashcard/novo_flashcard/')
